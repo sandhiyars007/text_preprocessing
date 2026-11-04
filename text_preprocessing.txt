@@ -1,0 +1,105 @@
+import pandas as pd
+import re
+
+     
+
+data = {
+    "id": [1],
+    "text": [
+        """Algorithms and data structures are central to computer science❤️. The theory of computation concerns abstract models of computation💻🤖 and general classes of problems that can be solved using them🤖. The fields of cryptography and computer security involve studying the means for secure communication and preventing security vulnerabilities🧠. Computer graphics and computational geometry address the generation of images. Programming language theory considers different ways to describe computational processes, and database theory concerns the management of repositories of data. Human-computer interaction investigates the interfaces through which humans and computers interact, and software engineering focuses on the design and principles behind developing software."""
+    ]
+}
+
+df = pd.DataFrame(data)
+
+print(df)
+     
+   id                                               text
+0   1  Algorithms and data structures are central to ...
+
+stop_words = {
+    "a","an","the","and","or","is","are","was","were","to","of","in",
+    "on","for","with","that","this","them","using","can","be","which",
+    "through","behind","different","it","its","their","as","by","from",
+    "into","at","about","than","have","has","had","will","would","could",
+    "should","do","does","did","not","but","if","then","else","while"
+}
+     
+
+def clean_text(text):
+
+    # Lowercase
+    text = text.lower()
+
+    # Remove emojis
+    text = re.sub(r'[^\x00-\x7F]+', '', text)
+
+    # Remove URLs
+    text = re.sub(r'http\S+|www\S+', '', text)
+
+    # Remove punctuation and numbers
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+
+    # Tokenization
+    tokens = text.split()
+
+    # Remove stopwords
+    tokens = [word for word in tokens if word not in stop_words]
+
+    # Join cleaned words
+    cleaned_text = " ".join(tokens)
+
+    return cleaned_text
+     
+
+df["cleaned_data"] = df["text"].apply(clean_text)
+
+print(df[["text","cleaned_data"]])
+     
+                                                text  \
+0  Algorithms and data structures are central to ...   
+
+                                        cleaned_data  
+0  algorithms data structures central computer sc...  
+
+df["tokens"] = df["cleaned_data"].apply(lambda x: x.split())
+
+print(df["tokens"])
+     
+0    [algorithms, data, structures, central, comput...
+Name: tokens, dtype: object
+
+df.to_csv("cleaned_data.csv", index=False, encoding="utf-8")
+
+print("✅ cleaned_data.csv created successfully!")
+     
+✅ cleaned_data.csv created successfully!
+
+# Save all outputs into a text file
+
+with open("output.txt", "w", encoding="utf-8") as f:
+
+    f.write("========== RAW DATA ==========\n\n")
+    f.write(df["text"][0])
+    f.write("\n\n")
+
+    f.write("========== CLEANED DATA ==========\n\n")
+    f.write(df["cleaned_data"][0])
+    f.write("\n\n")
+
+    f.write("========== TOKENS ==========\n\n")
+    f.write(str(df["tokens"][0]))
+    f.write("\n\n")
+
+print("✅ output.txt created successfully!")
+     
+✅ output.txt created successfully!
+
+from google.colab import files
+
+files.download("output.txt")
+     
+
+from google.colab import files
+
+files.download("cleaned_data.txt")
